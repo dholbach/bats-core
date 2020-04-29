@@ -179,9 +179,16 @@ bats_run_tests() {
       # fetch the return code
       wait "$test_pid" || status=1
       # wait for tests to finish in the order they were started and output their results as they come in
-      cat "$test_output_dir/stdout"
-      # additionally output stderr as parallel does by default
-      cat "$test_output_dir/stderr" >&2
+
+      # hack to fix #290 for Debian
+      if [[ ! -f "$test_output_dir/stdout" ]]; then
+        cat "$(find "$test_output_dir/" -name stdout)"
+        cat "$(find "$test_output_dir/" -name stderr)" >&2
+      else
+        cat "$test_output_dir/stdout"
+        # additionally output stderr as parallel does by default
+        cat "$test_output_dir/stderr" >&2
+      fi
     done
   else
     for test_name in "${tests_to_run[@]}"; do

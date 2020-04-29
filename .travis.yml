@@ -41,6 +41,12 @@ script:
     time bin/bats --formatter tap test
   fi
 
+  if [[ "${TRAVIS_OS_NAME:-}" == 'linux' && "${BASHVER:-}" == 5 ]]; then
+    docker run -it -v "${PWD}:/code" \
+      quay.io/crio/crio-build-amd64-go1.14:master-1.3.7 \
+      bash -c "/code/bin/bats /code/test"
+  fi
+
 notifications:
   email:
     on_success: never
